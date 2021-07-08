@@ -14,6 +14,10 @@ public class GameController : MonoBehaviour {
     public float readyDelay = 0.5f;
     public float loadPersonDelay = 0.3f;
 
+    // used as targets for PersonController
+    public Vector3 restaurantLocation, theatreLocation, libraryLocation;
+    public List<Vector3> houseLocations = new List<Vector3>();
+
     // data structs for creating levels
     // jam version: call LoadJamPuzzle() to fill structs with handmade jam level
     // call GenerateGame() to fill these structs with generated data
@@ -33,6 +37,10 @@ public class GameController : MonoBehaviour {
     float boardMaxX = 8.2f;
     float boardMinY = -8.05f;
     float boardMaxY = 0.5f;
+
+    // display these for the player
+    int impostersPlayed = 0;
+    int turnsPlayed = 0;
     
     void Awake() {
         if(instance == null) {
@@ -56,6 +64,23 @@ public class GameController : MonoBehaviour {
         foreach(BuildingData buildingData in buildings) {
             GameObject buildingObj = Instantiate(buildingPrefab);
             buildingObj.GetComponent<BuildingController>().InitBuilding(buildingData);
+
+            // store building location
+            BuildingType buildingType = buildingObj.GetComponent<BuildingController>().data.buildingType;
+            switch(buildingType) {
+            case BuildingType.HOUSE:
+                houseLocations.Add(buildingObj.transform.position);
+                break;
+            case BuildingType.RESTAURANT:
+                restaurantLocation = buildingObj.transform.position;
+                break;
+            case BuildingType.THEATRE:
+                theatreLocation = buildingObj.transform.position;
+                break;
+            case BuildingType.LIBRARY:
+                libraryLocation = buildingObj.transform.position;
+                break;
+            }
         }
         yield return new WaitForSeconds(loadPersonDelay);
         
@@ -86,6 +111,8 @@ public class GameController : MonoBehaviour {
     public IEnumerator DoTurn() {
         // disable the button
         turnStartButton.interactable = false;
+        turnsPlayed++;
+
         // destory any imposter in hand
         if(setImposterInstance != null) {
             Destroy(imposterInHand);
@@ -114,6 +141,18 @@ public class GameController : MonoBehaviour {
 
         // now allow all the people to move on the board
         // readyToMove = true;
+
+        // move all imposters to front of people queue so new imposters go first
+        for(int i = imposterQueue.Count - 1; i >= 0; i--) {
+            peopleQueue.Insert(0, imposterQueue[i]);
+        }
+        imposterQueue.Clear();
+
+        // prepare all people for next turn
+        foreach(PersonController person in peopleQueue) {
+            person.finishedTurn = false;
+        }
+
         yield return new WaitForSeconds(0.5f);
         // turn over, enable the start turn button and wait for user input event
         turnStartButton.interactable = true;
@@ -195,6 +234,7 @@ public class GameController : MonoBehaviour {
                     }
                     // add to imposter queue
                     imposterQueue.Add(imposterInHand.GetComponent<PersonController>());
+                    impostersPlayed++;
                     // leave the object on the board
                     imposterInHand = null;
                 }
@@ -213,7 +253,11 @@ public class GameController : MonoBehaviour {
         while(true) {
             // skip updating if player is setting an imposter
             if(imposterInHand != null) {
+                // temp output
+                // Debug.Log("N/A");
+                
                 yield return null;
+                continue;
             }
 
             // raycast at mouse position to see if there is a person there
@@ -236,14 +280,14 @@ public class GameController : MonoBehaviour {
                     }
 
                     // temp output
-                    Debug.Log(turnNum);
+                    // Debug.Log(turnNum);
 
                     break; // foreach loop
                 } 
             }
             if(!foundHit) {
                 // temp output
-                Debug.Log("N/A");
+                // Debug.Log("N/A");
             }
             yield return null;
         }

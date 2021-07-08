@@ -15,6 +15,7 @@ public class PersonData {
         emotionState = em;
         posX = x;
         posY = y;
+        dest = Destination.NONE;
         // based on when this override is used
         isImposter = false;
     }
@@ -37,6 +38,7 @@ public class PersonController : MonoBehaviour {
     public Material matDefault, matOutlined;
     public GameObject destinationSprite;
     public SpriteRenderer destinationSpriteRenderer;
+    public List<PersonController> peopleInTrigger = new List<PersonController>();
 
     public bool changedEmotionThisTurn = false;
     public bool finishedTurn = false;
@@ -44,6 +46,7 @@ public class PersonController : MonoBehaviour {
     PersonData data;
     Vector3 movementTarget;
     SpriteRenderer spriteRenderer;
+    float turnStepDelay = 0.25f;
 
     void Start() {
         // why is this not getting called on instantiate??
@@ -63,20 +66,74 @@ public class PersonController : MonoBehaviour {
         }
     }
 
+    void OnTriggerEnter2D(Collider2D col) {
+        // track any people that enter this person's trigger
+        if(col.gameObject.tag == "Person") {
+            PersonController person = col.transform.parent.GetComponent<PersonController>();
+            if(!peopleInTrigger.Contains(person)) {
+                peopleInTrigger.Add(person);
+            }
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D col) {
+        // track any people that leave this person's trigger
+        if(col.gameObject.tag == "Person") {
+            PersonController person = col.transform.parent.GetComponent<PersonController>();
+            if(peopleInTrigger.Contains(person)) {
+                peopleInTrigger.Remove(person);
+            }
+        }
+    }
+
     public IEnumerator DoTurn() {
         // make caller wait a second before checking if finished turn is done
         finishedTurn = false;
 
         // enable outline in shader
         spriteRenderer.sharedMaterial = matOutlined;
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(turnStepDelay);
+
+        // using Vector3.zero as a null value (no target set)
+        Vector3 targetPosition = Vector3.zero;
 
         switch(data.emotionState) {
         case Emotion.HAPPY:
             // a happy person with no destination will choose one
+            if(data.dest == Destination.NONE) {
+                SetDestination(GetRandomDestination());
+                yield return new WaitForSeconds(turnStepDelay);
+            }
+
             // they will update all happy people around them with their destination if they have none
+            // only pass the destination on if the person has not yet had their turn
+            foreach(PersonController person in peopleInTrigger) {
+                if(person.data.emotionState == Emotion.HAPPY && person.data.dest == Destination.NONE && !person.finishedTurn) {
+                    person.SetDestination(data.dest);
+                    yield return new WaitForSeconds(turnStepDelay);
+                }
+            }
+
             // they will make a sad person happy
+            foreach(PersonController person in peopleInTrigger) {
+                if(person.data.emotionState == Emotion.SAD) {
+                    person.UpdateEmotion(Emotion.HAPPY);
+                    break;
+                }
+            }
+
             // finally, they will move a limited distance towards the destination
+            switch(data.dest) {
+            case Destination.RESTAURANT:
+                targetPosition = GameController.instance.restaurantLocation;
+                break;
+            case Destination.THEATRE:
+                targetPosition = GameController.instance.theatreLocation;
+                break;
+            case Destination.LIBRARY:
+                targetPosition = GameController.instance.libraryLocation;
+                break;
+            }
             break;
         case Emotion.IDLE:
             // and idle person will become happy
@@ -94,11 +151,20 @@ public class PersonController : MonoBehaviour {
             break;
         }
 
+        // move towards target if a target is set
+        if(targetPosition != Vector3.zero) {
+            // loop for a certain amount of time, calling move towards
+            for(int i = 0; i < 75; i++) {
+                transform.position = Vector2.MoveTowards(transform.position, targetPosition, 0.025f);
+                yield return new WaitForSeconds(0.01f);
+            }
+        }
+
         // reset destination for a happy person
         ResetDestination();
 
         // disable outline in shader
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(turnStepDelay);
         spriteRenderer.sharedMaterial = matDefault;
 
         finishedTurn = true;
@@ -184,5 +250,12 @@ public class PersonController : MonoBehaviour {
 
     public bool IsImposter() {
         return data.isImposter;
+    }
+
+    // ideally, the choice of destination should not be random since it makes the solutions to the 
+    // puzzle random each time the game is played. this is good enough for the jam version
+    private Destination GetRandomDestination() {
+        // TODO
+        return Destination.LIBRARY;
     }
 }

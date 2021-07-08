@@ -58,6 +58,7 @@ public class GameController : MonoBehaviour {
             buildingObj.GetComponent<BuildingController>().InitBuilding(buildingData);
         }
         yield return new WaitForSeconds(loadPersonDelay);
+        
         // load people (with some delay)
         foreach(PersonData personData in people) {
             GameObject personObj = Instantiate(personPrefab);
@@ -67,6 +68,10 @@ public class GameController : MonoBehaviour {
             // TODO: add sound/visual effect
             yield return new WaitForSeconds(loadPersonDelay);
         }
+        
+        // start coroutine that reads mouse position for person turn number
+        StartCoroutine(checkMousePosition());
+
         // now waiting for player input button to start the round
         yield return new WaitForSeconds(loadPersonDelay);
         turnStartButton.interactable = true;
@@ -109,7 +114,7 @@ public class GameController : MonoBehaviour {
 
         // now allow all the people to move on the board
         // readyToMove = true;
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
         // turn over, enable the start turn button and wait for user input event
         turnStartButton.interactable = true;
         yield return null;
@@ -136,15 +141,19 @@ public class GameController : MonoBehaviour {
         // set te imposter emotion
         // also set imposter saying for cases 0-2
         Emotion imposterEmotion = Emotion.HAPPY;
+        Destination imposterDest = Destination.NONE;
         switch(whichImposter) {
         case 0:
             // imposter says resturant
+            imposterDest = Destination.RESTAURANT;
             break;
         case 1:
             // imposter says theatre
+            imposterDest = Destination.THEATRE;
             break;
         case 2:
             // imposter says library
+            imposterDest = Destination.LIBRARY;
             break;
         case 4:
             imposterEmotion = Emotion.SAD;
@@ -162,9 +171,13 @@ public class GameController : MonoBehaviour {
 
         // create an imposter gameobject
         imposterInHand = Instantiate(imposterPrefab);
-        imposterInHand.GetComponent<PersonController>().InitPerson(new PersonData(imposterEmotion, -10, -10));
+        imposterInHand.GetComponent<PersonController>().InitPerson(new PersonData(imposterEmotion, -10, -10, imposterDest));
         // make the imposter appear transparent
         imposterInHand.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.5f);
+        // this is probably inefficient
+        if(imposterDest != Destination.NONE) {
+            imposterInHand.GetComponent<PersonController>().destinationSprite.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.5f);
+        }
 
         // loop until player clicks left mouse button
         while(true) {
@@ -177,6 +190,9 @@ public class GameController : MonoBehaviour {
                 if(target.x <= boardMaxX && target.x >= boardMinX && target.y <= boardMaxY && target.y >= boardMinY) {
                     // reset transparency in color
                     imposterInHand.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
+                    if(imposterDest != Destination.NONE) {
+                        imposterInHand.GetComponent<PersonController>().destinationSprite.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
+                    }
                     // add to imposter queue
                     imposterQueue.Add(imposterInHand.GetComponent<PersonController>());
                     // leave the object on the board
@@ -189,6 +205,46 @@ public class GameController : MonoBehaviour {
                 break;
             }
             // yield return null to prevent infinite loop crash
+            yield return null;
+        }
+    }
+
+    public IEnumerator checkMousePosition() {
+        while(true) {
+            // skip updating if player is setting an imposter
+            if(imposterInHand != null) {
+                yield return null;
+            }
+
+            // raycast at mouse position to see if there is a person there
+            // RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+            Collider2D[] col = Physics2D.OverlapPointAll(Camera.main.ScreenToWorldPoint(Input.mousePosition));            
+
+            bool foundHit = false;
+            foreach(Collider2D hit in col) {
+                if(hit && hit.gameObject.tag == "Person") {
+                    foundHit = true;
+                    PersonController person = hit.transform.parent.GetComponent<PersonController>();
+                    int turnNum = 0;
+
+                    if(person.IsImposter()) {
+                        turnNum = imposterQueue.IndexOf(person) + 1;
+                    } 
+                    else {
+                        turnNum = imposterQueue.Count;
+                        turnNum += peopleQueue.IndexOf(person) + 1;
+                    }
+
+                    // temp output
+                    Debug.Log(turnNum);
+
+                    break; // foreach loop
+                } 
+            }
+            if(!foundHit) {
+                // temp output
+                Debug.Log("N/A");
+            }
             yield return null;
         }
     }
@@ -267,7 +323,7 @@ public class GameController : MonoBehaviour {
         return Emotion.HAPPY;
     }
     
-    public void LoadJamPuzzle() {
+    /* public void LoadJamPuzzle() {
         // fill data structures with preset data
         // add people
         people.Add(new PersonData(Emotion.HAPPY, 2.5f, -0.5f));
@@ -280,5 +336,5 @@ public class GameController : MonoBehaviour {
         buildings.Add(new BuildingData(BuildingType.LIBRARY, 1, -5));
         // load game
         StartCoroutine(LoadGame());
-    }
+    } */
 }

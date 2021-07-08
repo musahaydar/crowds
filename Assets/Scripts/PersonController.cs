@@ -7,30 +7,48 @@ public enum Destination { NONE, RESTAURANT, THEATRE, LIBRARY }
 
 public class PersonData {
     public Emotion emotionState = Emotion.HAPPY;
+    public Destination dest = Destination.NONE;
     public float posX, posY;
+    public bool isImposter;
     
     public PersonData(Emotion em, float x, float y) {
         emotionState = em;
         posX = x;
         posY = y;
+        // based on when this override is used
+        isImposter = false;
+    }
+
+    // override to also set desintation for imposter
+    public PersonData(Emotion em, float x, float y, Destination d) {
+        emotionState = em;
+        posX = x;
+        posY = y;
+        dest = d;
+        // based on when this override is used
+        isImposter = true;
     }
 }
 
 public class PersonController : MonoBehaviour {
     // set in inspector
     public Sprite sprHappy, sprIdle, sprSad, sprAngry, sprScared;
+    public Sprite sprDestRestaurant, sprDestTheatre, sprDestLibrary;
     public Material matDefault, matOutlined;
+    public GameObject destinationSprite;
+    public SpriteRenderer destinationSpriteRenderer;
 
     public bool changedEmotionThisTurn = false;
     public bool finishedTurn = false;
-    public Destination dest = Destination.NONE;
 
     PersonData data;
     Vector3 movementTarget;
     SpriteRenderer spriteRenderer;
 
     void Start() {
+        // why is this not getting called on instantiate??
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+        destinationSpriteRenderer = destinationSprite.GetComponent<SpriteRenderer>();
     }
 
     public void InitPerson(PersonData inData) {
@@ -38,6 +56,11 @@ public class PersonController : MonoBehaviour {
         // set initial position
         gameObject.transform.position = new Vector3(inData.posX, inData.posY, gameObject.transform.position.z);
         UpdateEmotionSprite();
+
+        // for spawning imposters
+        if(inData.dest != Destination.NONE) {
+            UpdateDestinationSprite();
+        }
     }
 
     public IEnumerator DoTurn() {
@@ -70,8 +93,6 @@ public class PersonController : MonoBehaviour {
             // a scared person will move towards the nearest building
             break;
         }
-
-        // do any movements (in turn, not all at once)
 
         // reset destination for a happy person
         ResetDestination();
@@ -124,13 +145,44 @@ public class PersonController : MonoBehaviour {
         UpdateEmotionSprite();
     }
 
+    private void UpdateDestinationSprite() {
+        if(destinationSpriteRenderer == null) {
+            destinationSpriteRenderer = destinationSprite.GetComponent<SpriteRenderer>();
+        }
+
+        switch(data.dest) {
+        case Destination.NONE:
+            // disable destination prompt sprite
+            destinationSprite.SetActive(false);
+            break;
+        case Destination.RESTAURANT:
+            destinationSprite.SetActive(true);
+            destinationSpriteRenderer.sprite = sprDestRestaurant;
+            break;
+        case Destination.THEATRE:
+            destinationSprite.SetActive(true);
+            destinationSpriteRenderer.sprite = sprDestTheatre;
+            break;
+        case Destination.LIBRARY:
+            destinationSprite.SetActive(true);
+            destinationSpriteRenderer.sprite = sprDestLibrary;
+            break;
+        }
+    }
+
     public void SetDestination(Destination d) {
-        dest = d;
+        data.dest = d;
         // update enable destination target sprite
+        UpdateDestinationSprite();
     }
 
     public void ResetDestination() {
-        dest = Destination.NONE;
+        data.dest = Destination.NONE;
         // disable destination target sprite
+        UpdateDestinationSprite();
+    }
+
+    public bool IsImposter() {
+        return data.isImposter;
     }
 }

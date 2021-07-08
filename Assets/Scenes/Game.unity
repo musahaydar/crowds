@@ -598,7 +598,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 218084503}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1879963159}
+        m_MethodName: SetImposterButton
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 5
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &218084503
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1416,7 +1427,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 463392621}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1879963159}
+        m_MethodName: SetImposterButton
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 2
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &463392621
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1824,7 +1846,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 514482388}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1879963159}
+        m_MethodName: SetImposterButton
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 7
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &514482388
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4318,7 +4351,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 996438450}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1879963159}
+        m_MethodName: SetImposterButton
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &996438450
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4933,7 +4977,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1093498284}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1879963159}
+        m_MethodName: SetImposterButton
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1093498284
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5138,7 +5193,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1139359264}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1879963159}
+        m_MethodName: SetImposterButton
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 6
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1139359264
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5541,8 +5607,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 71, y: -40}
-  m_SizeDelta: {x: 100, y: 50}
+  m_AnchoredPosition: {x: 76, y: -40}
+  m_SizeDelta: {x: 110.000015, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1239211588
 MonoBehaviour:
@@ -5724,7 +5790,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1271163085}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1879963159}
+        m_MethodName: SetImposterButton
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 4
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1271163085
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6836,6 +6913,9 @@ GameObject:
   - component: {fileID: 1796983864}
   - component: {fileID: 1796983866}
   - component: {fileID: 1796983865}
+  - component: {fileID: 1796983869}
+  - component: {fileID: 1796983868}
+  - component: {fileID: 1796983867}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -6875,18 +6955,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
+    m_Font: {fileID: 12800000, guid: 687878ea580a7cb4ab8427d099d49abc, type: 3}
+    m_FontSize: 18
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 10
+    m_MinSize: 0
     m_MaxSize: 40
     m_Alignment: 4
     m_AlignByGeometry: 0
@@ -6903,6 +6983,49 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1796983863}
   m_CullTransparentMesh: 0
+--- !u!114 &1796983867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1796983863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ada3bf881dd7644e81136dfaebb6bff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0.40000004, g: 0.40000004, b: 0.40000004, a: 1}
+  m_EffectDistance: {x: 1.5, y: -1.5}
+  m_UseGraphicAlpha: 1
+--- !u!208 &1796983868
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1796983863}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0.5
+--- !u!114 &1796983869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1796983863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f138723cf367bbd4ba714c1c1dc3846d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1804702732
 GameObject:
   m_ObjectHideFlags: 0
@@ -7397,7 +7520,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1858507486}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1879963159}
+        m_MethodName: SetImposterButton
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 3
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1858507486
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7551,7 +7685,8 @@ MonoBehaviour:
     type: 3}
   buildingPrefab: {fileID: 5280100276212842751, guid: 821a6a38f6567fd449daca56b6417300,
     type: 3}
-  imposterPrefab: {fileID: 0}
+  imposterPrefab: {fileID: 7568461804551117043, guid: 562e8e0cb909f0a4994063f6e86eedef,
+    type: 3}
   turnStartButton: {fileID: 1239211588}
   readyDelay: 0.5
   loadPersonDelay: 0.3

@@ -96,6 +96,7 @@ public class PersonController : MonoBehaviour {
 
         // using Vector3.zero as a null value (no target set)
         Vector3 targetPosition = Vector3.zero;
+        int speedMultiple = 1;
 
         switch(data.emotionState) {
         case Emotion.HAPPY:
@@ -137,7 +138,17 @@ public class PersonController : MonoBehaviour {
             }
             break;
         case Emotion.IDLE:
+            // an idle person will make on scared person idle
+            foreach(PersonController person in peopleInTrigger) {
+                if(person.data.emotionState == Emotion.SCARED) {
+                    person.UpdateEmotion(Emotion.IDLE);
+                    yield return new WaitForSeconds(turnStepDelay * 2);
+                    break;
+                }
+            }
+            
             // and idle person will become happy
+            yield return new WaitForSeconds(turnStepDelay);
             UpdateEmotion(Emotion.HAPPY);
             break;
         case Emotion.SAD:
@@ -163,6 +174,27 @@ public class PersonController : MonoBehaviour {
         case Emotion.ANGRY:
             // an angry person will make one person around them angry
             // and then move in the opposite direction of that person
+            bool madePersonAngry = false;
+
+            foreach(PersonController person in peopleInTrigger) {
+                if(person.data.emotionState != Emotion.ANGRY) {
+                    person.UpdateEmotion(Emotion.ANGRY);
+                    targetPosition = person.gameObject.transform.position;
+                    speedMultiple = -1;
+                    madePersonAngry = true;
+                    break;
+                }
+            }
+
+            // if an angry person made no one angry, they become idle
+            if(!madePersonAngry) {
+                // become idle regardless of emotion was changed this turn
+                // but don't allow emotion to change again this turn
+                data.emotionState = Emotion.IDLE;
+                UpdateEmotionSprite();
+                changedEmotionThisTurn = true;
+            } 
+            yield return new WaitForSeconds(turnStepDelay);
             break;
         case Emotion.SCARED:
             // a scared person will make up to two people around them scared
@@ -185,6 +217,7 @@ public class PersonController : MonoBehaviour {
                 float distance = (houseLocation - gameObject.transform.position).magnitude;
                 if(distance < bestDistance) {
                     targetPosition = houseLocation;
+                    bestDistance = distance;
                 }
             }
 
@@ -194,8 +227,23 @@ public class PersonController : MonoBehaviour {
         // move towards target if a target is set
         if(targetPosition != Vector3.zero) {
             // loop for a certain amount of time, calling move towards
-            for(int i = 0; i < 75; i++) {
-                transform.position = Vector2.MoveTowards(transform.position, targetPosition, 0.025f);
+            for(int i = 0; i < 50; i++) {
+                transform.position = Vector2.MoveTowards(transform.position, targetPosition, speedMultiple * 0.025f);
+                // move back if person exceeds any bounds
+                Vector3 newPos = transform.position;
+                if(newPos.x > GameController.instance.boardMaxX) {
+                    newPos.x = GameController.instance.boardMaxX;
+                }
+                else if(newPos.x < GameController.instance.boardMinX) {
+                    newPos.x = GameController.instance.boardMinX;
+                }
+                if(newPos.y > GameController.instance.boardMaxY) {
+                    newPos.y = GameController.instance.boardMaxY;
+                }
+                else if(newPos.y < GameController.instance.boardMinY) {
+                    newPos.y = GameController.instance.boardMinY;
+                }
+                transform.position = newPos;
                 yield return new WaitForSeconds(0.01f);
             }
         }

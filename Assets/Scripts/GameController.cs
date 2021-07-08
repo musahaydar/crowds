@@ -34,10 +34,10 @@ public class GameController : MonoBehaviour {
     GameObject imposterInHand;
 
     // these should probably not be constants
-    float boardMinX = -0.2f;
-    float boardMaxX = 8.2f;
-    float boardMinY = -8.05f;
-    float boardMaxY = 0.5f;
+    [HideInInspector] public float boardMinX = -0.2f;
+    [HideInInspector] public float boardMaxX = 8.2f;
+    [HideInInspector] public float boardMinY = -8.05f;
+    [HideInInspector] public float boardMaxY = 0.5f;
 
     // display these for the player
     int impostersPlayed = 0;

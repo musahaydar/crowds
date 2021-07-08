@@ -18,6 +18,9 @@ public class BuildingData {
 public class BuildingController : MonoBehaviour {
     public const float yOffset = 0.2f;
 
+    // since it's not important which building a person is in, we can simply track which people are in any building
+    public static List<PersonController> peopleInBuildings = new List<PersonController>();
+
     public BuildingData data;
     
     SpriteRenderer spriteRenderer;
@@ -44,6 +47,26 @@ public class BuildingController : MonoBehaviour {
         case BuildingType.RESTAURANT:
             spriteRenderer.sprite = sprRestaurant;
             break;
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D col) {
+        if(col.gameObject.tag == "Person") {
+            PersonController p = col.transform.parent.GetComponent<PersonController>();
+            // it is possible for people colliders to be in two buildings at once, so check
+            if(!peopleInBuildings.Contains(p)) {
+                peopleInBuildings.Add(p);
+            }
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D col) {
+        if(col.gameObject.tag == "Person") {
+            PersonController p = col.transform.parent.GetComponent<PersonController>();
+            // it is possible for people colliders to be in two buildings at once, so check
+            if(peopleInBuildings.Contains(p)) {
+                peopleInBuildings.Remove(p);
+            }
         }
     }
 }

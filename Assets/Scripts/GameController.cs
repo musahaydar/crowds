@@ -28,6 +28,7 @@ public class GameController : MonoBehaviour {
     // queue of imposters
     List<PersonController> imposterQueue = new List<PersonController>();
     List<PersonController> peopleQueue = new List<PersonController>();
+    List<PersonController> personRemovalQueue = new List<PersonController>();
 
     IEnumerator setImposterInstance = null;
     GameObject imposterInHand;
@@ -148,9 +149,20 @@ public class GameController : MonoBehaviour {
         }
         imposterQueue.Clear();
 
+        // remove all people in the removal queue
+        foreach(PersonController person in personRemovalQueue) {
+            if(peopleQueue.Contains(person)) {
+                peopleQueue.Remove(person);
+            }
+            Destroy(person.gameObject);
+        }
+        personRemovalQueue.Clear();
+        // check win condition here, since this is the only place a person is removed from the game
+
         // prepare all people for next turn
         foreach(PersonController person in peopleQueue) {
             person.finishedTurn = false;
+            person.changedEmotionThisTurn = false;
         }
 
         yield return new WaitForSeconds(0.5f);
@@ -291,6 +303,10 @@ public class GameController : MonoBehaviour {
             }
             yield return null;
         }
+    }
+
+    public void RemovePersonFromBoard(PersonController person) {
+        personRemovalQueue.Add(person);
     }
     
     public void GenerateGame() {

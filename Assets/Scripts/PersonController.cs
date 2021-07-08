@@ -118,6 +118,7 @@ public class PersonController : MonoBehaviour {
             foreach(PersonController person in peopleInTrigger) {
                 if(person.data.emotionState == Emotion.SAD) {
                     person.UpdateEmotion(Emotion.HAPPY);
+                    yield return new WaitForSeconds(turnStepDelay * 2);
                     break;
                 }
             }
@@ -141,13 +142,52 @@ public class PersonController : MonoBehaviour {
             break;
         case Emotion.SAD:
             // a sad person will make one person around them sad, and stay in place
+            // first, try to get a random person and make them sad
+            // NOTE: this was kind of buggy and is probably unnecessary
+            // int randomPersonIndex = Random.Range(0, peopleInTrigger.Count);
+            // if(peopleInTrigger[randomPersonIndex].data.emotionState != Emotion.SAD) {
+            //    peopleInTrigger[randomPersonIndex].UpdateEmotion(Emotion.SAD);
+            // } else {
+            // since we picked a sad person randomly, we'll iterate through all the people
+            // and make the first non-sad one we find sad
+            foreach(PersonController person in peopleInTrigger) {
+                if(person.data.emotionState != Emotion.SAD) {
+                    person.UpdateEmotion(Emotion.SAD);
+                    break;
+                }
+            }
+            // }
+            // delay for turning someone happy
+            yield return new WaitForSeconds(turnStepDelay * 2);
             break;
         case Emotion.ANGRY:
             // an angry person will make one person around them angry
             // and then move in the opposite direction of that person
             break;
         case Emotion.SCARED:
-            // a scared person will move towards the nearest building
+            // a scared person will make up to two people around them scared
+            // select the first two non-scared people in it's trigger
+            int counter = 2;
+            foreach(PersonController person in peopleInTrigger) {
+                if(person.data.emotionState != Emotion.SCARED) {
+                    person.UpdateEmotion(Emotion.SCARED);
+                    counter--;
+                    yield return new WaitForSeconds(turnStepDelay * 2);
+                }
+                if(counter <= 0) {
+                    break;
+                }
+            }
+
+            // then they will move towards the nearest building
+            float bestDistance = float.PositiveInfinity;
+            foreach(Vector3 houseLocation in GameController.instance.houseLocations) {
+                float distance = (houseLocation - gameObject.transform.position).magnitude;
+                if(distance < bestDistance) {
+                    targetPosition = houseLocation;
+                }
+            }
+
             break;
         }
 
@@ -163,9 +203,23 @@ public class PersonController : MonoBehaviour {
         // reset destination for a happy person
         ResetDestination();
 
+        // check if the person is in a building
+        if(BuildingController.peopleInBuildings.Contains(this)) {
+            GameController.instance.RemovePersonFromBoard(this);
+            BuildingController.peopleInBuildings.Remove(this);
+
+            // move the person to the top layer and play a sound effect for entering the building
+            gameObject.GetComponent<AbsoluteSortingOrder>().enabled = false;
+            spriteRenderer.sortingOrder = 1000;
+            yield  return new WaitForSeconds(turnStepDelay);
+
+            // make the person transparent, they will be removed later by the GameController
+            spriteRenderer.color = new Color(1, 1, 1, 0);
+        }
+
         // disable outline in shader
-        yield return new WaitForSeconds(turnStepDelay);
         spriteRenderer.sharedMaterial = matDefault;
+        yield return new WaitForSeconds(turnStepDelay);
 
         finishedTurn = true;
         yield return null;
@@ -207,7 +261,11 @@ public class PersonController : MonoBehaviour {
     }
 
     public void UpdateEmotion(Emotion e) {
+        if(changedEmotionThisTurn) {
+            return;
+        }
         data.emotionState = e;
+        changedEmotionThisTurn = true;
         UpdateEmotionSprite();
     }
 
@@ -255,7 +313,19 @@ public class PersonController : MonoBehaviour {
     // ideally, the choice of destination should not be random since it makes the solutions to the 
     // puzzle random each time the game is played. this is good enough for the jam version
     private Destination GetRandomDestination() {
-        // TODO
-        return Destination.LIBRARY;
+        Destination d = Destination.RESTAURANT;
+        int r = Random.Range(0, 3);
+        switch(r) {
+        case 0:
+            d = Destination.RESTAURANT;
+            break;
+        case 1:
+            d = Destination.THEATRE;
+            break;
+        case 2:
+            d = Destination.LIBRARY;
+            break;
+        }
+        return d;
     }
 }

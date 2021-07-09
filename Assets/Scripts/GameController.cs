@@ -432,7 +432,13 @@ public class GameController : MonoBehaviour {
     } */
 
     public void LoadScene(string scene) {
+        StartCoroutine(LoadSceneHelper(scene));
+    }
+
+    public IEnumerator LoadSceneHelper(string scene) {
+        // add delay for sound effect
         SceneManager.LoadScene(scene);
+        yield return null;
     }
 
     public void ResetPuzzle() {

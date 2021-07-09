@@ -29,7 +29,7 @@ public class BuildingController : MonoBehaviour {
     public Sprite sprHouse, sprRestaurant, sprTheatre, sprLibrary;
 
     public void InitBuilding(BuildingData inData) {
-        data = inData;
+        data = new BuildingData(inData.buildingType, inData.posX, inData.posY);
         // set position based on input
         gameObject.transform.position = new Vector3((float)inData.posX, (float)(inData.posY) + yOffset, gameObject.transform.position.z);
         // set sprite

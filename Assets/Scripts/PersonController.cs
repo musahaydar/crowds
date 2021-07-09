@@ -55,7 +55,7 @@ public class PersonController : MonoBehaviour {
     }
 
     public void InitPerson(PersonData inData) {
-        data = inData;
+        data = new PersonData(inData.emotionState, inData.posX, inData.posY, inData.dest);
         // set initial position
         gameObject.transform.position = new Vector3(inData.posX, inData.posY, gameObject.transform.position.z);
         UpdateEmotionSprite();

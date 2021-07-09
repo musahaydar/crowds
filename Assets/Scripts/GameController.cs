@@ -10,6 +10,7 @@ public class GameController : MonoBehaviour {
     public GameObject personPrefab;
     public GameObject buildingPrefab;
     public GameObject imposterPrefab;
+    public GameObject resetObjectPrefab;
     public Button turnStartButton;
     // public bool readyToMove = false;
     public float readyDelay = 0.5f;
@@ -60,9 +61,16 @@ public class GameController : MonoBehaviour {
 
     void Start() {
         turnStartButton.interactable = false;
-        // temp: for testing
-        // (actually this might be good enough for the jam build)
-        GenerateGame();
+        // check for a reset object
+        GameObject resetObj = GameObject.FindGameObjectWithTag("ResetObject");
+        if(resetObj != null) {
+            people = resetObj.GetComponent<ResetObjectController>().people;
+            buildings = resetObj.GetComponent<ResetObjectController>().buildings;
+            Destroy(resetObj);
+            StartCoroutine(LoadGame());
+        } else {
+            GenerateGame();
+        }
     }
 
     void Update() {
@@ -71,6 +79,9 @@ public class GameController : MonoBehaviour {
     }
 
     public IEnumerator LoadGame() {
+        // clear any saved building data
+        BuildingController.peopleInBuildings.Clear();
+
         // load buildings (instant)
         foreach(BuildingData buildingData in buildings) {
             GameObject buildingObj = Instantiate(buildingPrefab);
@@ -422,5 +433,14 @@ public class GameController : MonoBehaviour {
 
     public void LoadScene(string scene) {
         SceneManager.LoadScene(scene);
+    }
+
+    public void ResetPuzzle() {
+        GameObject resetObj = Instantiate(resetObjectPrefab);
+        DontDestroyOnLoad(resetObj);
+        // save data structs for level creation
+        resetObj.GetComponent<ResetObjectController>().buildings = buildings;
+        resetObj.GetComponent<ResetObjectController>().people = people;
+        LoadScene("Game");
     }
 }

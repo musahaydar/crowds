@@ -90,6 +90,7 @@ public class PersonController : MonoBehaviour {
 
         // enable outline in shader
         spriteRenderer.sharedMaterial = matOutlined;
+        SoundBankController.instance.PlayPieceFlash();
         yield return new WaitForSeconds(turnStepDelay);
 
         // using Vector3.zero as a null value (no target set)
@@ -108,6 +109,7 @@ public class PersonController : MonoBehaviour {
             foreach(PersonController person in peopleInTrigger) {
                 if(person.data.emotionState == Emotion.SAD) {
                     person.UpdateEmotion(Emotion.HAPPY);
+                    SoundBankController.instance.PlayChangeEmotion(Emotion.HAPPY);
                     yield return new WaitForSeconds(turnStepDelay * 2);
                     break;
                 }
@@ -140,6 +142,7 @@ public class PersonController : MonoBehaviour {
             foreach(PersonController person in peopleInTrigger) {
                 if(person.data.emotionState == Emotion.SCARED) {
                     person.UpdateEmotion(Emotion.IDLE);
+                    SoundBankController.instance.PlayChangeEmotion(Emotion.IDLE);
                     yield return new WaitForSeconds(turnStepDelay * 2);
                     break;
                 }
@@ -148,6 +151,7 @@ public class PersonController : MonoBehaviour {
             // and idle person will become happy
             yield return new WaitForSeconds(turnStepDelay);
             UpdateEmotion(Emotion.HAPPY);
+            SoundBankController.instance.PlayChangeEmotion(Emotion.HAPPY);
             break;
         case Emotion.SAD:
             // a sad person will make one person around them sad, and stay in place
@@ -162,6 +166,7 @@ public class PersonController : MonoBehaviour {
             foreach(PersonController person in peopleInTrigger) {
                 if(person.data.emotionState != Emotion.SAD) {
                     person.UpdateEmotion(Emotion.SAD);
+                    SoundBankController.instance.PlayChangeEmotion(Emotion.SAD);
                     break;
                 }
             }
@@ -177,6 +182,7 @@ public class PersonController : MonoBehaviour {
             foreach(PersonController person in peopleInTrigger) {
                 if(person.data.emotionState != Emotion.ANGRY) {
                     person.UpdateEmotion(Emotion.ANGRY);
+                    SoundBankController.instance.PlayChangeEmotion(Emotion.ANGRY);
                     targetPosition = person.gameObject.transform.position;
                     speedMultiple = -1;
                     madePersonAngry = true;
@@ -189,6 +195,7 @@ public class PersonController : MonoBehaviour {
                 // become idle regardless of emotion was changed this turn
                 // but don't allow emotion to change again this turn
                 data.emotionState = Emotion.IDLE;
+                SoundBankController.instance.PlayChangeEmotion(Emotion.IDLE);
                 UpdateEmotionSprite();
                 changedEmotionThisTurn = true;
             } 
@@ -201,6 +208,7 @@ public class PersonController : MonoBehaviour {
             foreach(PersonController person in peopleInTrigger) {
                 if(person.data.emotionState != Emotion.SCARED) {
                     person.UpdateEmotion(Emotion.SCARED);
+                    SoundBankController.instance.PlayChangeEmotion(Emotion.SCARED);
                     counter--;
                     yield return new WaitForSeconds(turnStepDelay * 2);
                 }
@@ -224,6 +232,7 @@ public class PersonController : MonoBehaviour {
 
         // move towards target if a target is set
         if(targetPosition != Vector3.zero) {
+            SoundBankController.instance.walking.Play();
             // loop for a certain amount of time, calling move towards
             for(int i = 0; i < 50; i++) {
                 transform.position = Vector2.MoveTowards(transform.position, targetPosition, speedMultiple * 0.025f);
@@ -251,13 +260,16 @@ public class PersonController : MonoBehaviour {
 
         // check if the person is in a building
         if(BuildingController.peopleInBuildings.Contains(this)) {
+            yield return new WaitForSeconds(turnStepDelay);
+            SoundBankController.instance.door.Play();
+
             GameController.instance.RemovePersonFromBoard(this);
             BuildingController.peopleInBuildings.Remove(this);
 
             // move the person to the top layer and play a sound effect for entering the building
             gameObject.GetComponent<AbsoluteSortingOrder>().enabled = false;
             spriteRenderer.sortingOrder = 1000;
-            yield  return new WaitForSeconds(turnStepDelay);
+            yield return new WaitForSeconds(turnStepDelay);
 
             // make the person transparent, they will be removed later by the GameController
             spriteRenderer.color = new Color(1, 1, 1, 0);

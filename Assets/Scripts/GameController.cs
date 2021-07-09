@@ -130,6 +130,7 @@ public class GameController : MonoBehaviour {
     // called from pressing button unity event
     public void StartTurn() {        
         StartCoroutine(DoTurn());
+        SoundBankController.instance.buttonPress.Play();
     }
 
     public IEnumerator DoTurn() {
@@ -256,6 +257,7 @@ public class GameController : MonoBehaviour {
         // create an imposter gameobject
         imposterInHand = Instantiate(imposterPrefab);
         imposterInHand.GetComponent<PersonController>().InitPerson(new PersonData(imposterEmotion, -10, -10, imposterDest, true));
+        SoundBankController.instance.PlayPieceSelect(imposterEmotion, imposterDest);
         // make the imposter appear transparent
         imposterInHand.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.5f);
         // this is probably inefficient
@@ -282,6 +284,7 @@ public class GameController : MonoBehaviour {
                     impostersPlayed++;
                     // leave the object on the board
                     imposterInHand = null;
+                    SoundBankController.instance.PlayPieceDrop(imposterEmotion, imposterDest);
                 }
                 // remove the imposter in hand if click outside board
                 else {
@@ -440,6 +443,8 @@ public class GameController : MonoBehaviour {
 
     public IEnumerator LoadSceneHelper(string scene) {
         // add delay for sound effect
+        SoundBankController.instance.buttonPress.Play();
+        yield return new WaitForSeconds(0.1f);
         SceneManager.LoadScene(scene);
         yield return null;
     }

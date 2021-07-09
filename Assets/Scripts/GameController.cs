@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour {
     public static GameController instance;
@@ -13,6 +14,10 @@ public class GameController : MonoBehaviour {
     // public bool readyToMove = false;
     public float readyDelay = 0.5f;
     public float loadPersonDelay = 0.3f;
+
+    // UI objects, set in inspector
+    public Text turnText, imposterCountText, queuePromptText;
+    public GameObject winPrompt;
 
     // used as targets for PersonController
     public Vector3 restaurantLocation, theatreLocation, libraryLocation;
@@ -58,6 +63,11 @@ public class GameController : MonoBehaviour {
         // temp: for testing
         // (actually this might be good enough for the jam build)
         GenerateGame();
+    }
+
+    void Update() {
+        turnText.text = "Turns: " + turnsPlayed;
+        imposterCountText.text = "Imposters: " + impostersPlayed;
     }
 
     public IEnumerator LoadGame() {
@@ -145,6 +155,7 @@ public class GameController : MonoBehaviour {
 
         // move all imposters to front of people queue so new imposters go first
         for(int i = imposterQueue.Count - 1; i >= 0; i--) {
+            imposterQueue[i].SetImposterFalse();
             peopleQueue.Insert(0, imposterQueue[i]);
         }
         imposterQueue.Clear();
@@ -157,7 +168,15 @@ public class GameController : MonoBehaviour {
             Destroy(person.gameObject);
         }
         personRemovalQueue.Clear();
+
         // check win condition here, since this is the only place a person is removed from the game
+        // player wins if all the imposters & people are off the board
+        if(imposterQueue.Count == 0 && peopleQueue.Count == 0) {
+            winPrompt.SetActive(true);
+
+            // don't re-enable turn start button
+            yield break;
+        }
 
         // prepare all people for next turn
         foreach(PersonController person in peopleQueue) {
@@ -267,6 +286,7 @@ public class GameController : MonoBehaviour {
             if(imposterInHand != null) {
                 // temp output
                 // Debug.Log("N/A");
+                queuePromptText.text = "[Mouse over] \nOrder Number: N/A";
                 
                 yield return null;
                 continue;
@@ -286,13 +306,14 @@ public class GameController : MonoBehaviour {
                     if(person.IsImposter()) {
                         turnNum = imposterQueue.IndexOf(person) + 1;
                     } 
-                    else {
+                    else if(!person.IsImposter()) {
                         turnNum = imposterQueue.Count;
                         turnNum += peopleQueue.IndexOf(person) + 1;
                     }
 
                     // temp output
                     // Debug.Log(turnNum);
+                    queuePromptText.text = "[Mouse over] \nOrder Number: " + turnNum;
 
                     break; // foreach loop
                 } 
@@ -300,6 +321,7 @@ public class GameController : MonoBehaviour {
             if(!foundHit) {
                 // temp output
                 // Debug.Log("N/A");
+                queuePromptText.text = "[Mouse over] \nOrder Number: N/A";
             }
             yield return null;
         }
@@ -397,4 +419,8 @@ public class GameController : MonoBehaviour {
         // load game
         StartCoroutine(LoadGame());
     } */
+
+    public void LoadScene(string scene) {
+        SceneManager.LoadScene(scene);
+    }
 }

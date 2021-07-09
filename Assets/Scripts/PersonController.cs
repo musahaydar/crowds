@@ -106,21 +106,21 @@ public class PersonController : MonoBehaviour {
                 yield return new WaitForSeconds(turnStepDelay);
             }
 
-            // they will update all happy people around them with their destination if they have none
-            // only pass the destination on if the person has not yet had their turn
-            foreach(PersonController person in peopleInTrigger) {
-                if(person.data.emotionState == Emotion.HAPPY && person.data.dest == Destination.NONE && !person.finishedTurn) {
-                    person.SetDestination(data.dest);
-                    yield return new WaitForSeconds(turnStepDelay);
-                }
-            }
-
             // they will make a sad person happy
             foreach(PersonController person in peopleInTrigger) {
                 if(person.data.emotionState == Emotion.SAD) {
                     person.UpdateEmotion(Emotion.HAPPY);
                     yield return new WaitForSeconds(turnStepDelay * 2);
                     break;
+                }
+            }
+
+            // they will update all happy people around them with their destination if they have none
+            // only pass the destination on if the person has not yet had their turn
+            foreach(PersonController person in peopleInTrigger) {
+                if(person.data.emotionState == Emotion.HAPPY && person.data.dest == Destination.NONE && !person.finishedTurn) {
+                    person.SetDestination(data.dest);
+                    yield return new WaitForSeconds(turnStepDelay);
                 }
             }
 
@@ -356,6 +356,10 @@ public class PersonController : MonoBehaviour {
 
     public bool IsImposter() {
         return data.isImposter;
+    }
+
+    public void SetImposterFalse() {
+        data.isImposter = false;
     }
 
     // ideally, the choice of destination should not be random since it makes the solutions to the 

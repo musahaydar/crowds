@@ -11,23 +11,21 @@ public class PersonData {
     public float posX, posY;
     public bool isImposter;
     
-    public PersonData(Emotion em, float x, float y) {
+    public PersonData(Emotion em, float x, float y, bool imposter = false) {
         emotionState = em;
         posX = x;
         posY = y;
         dest = Destination.NONE;
-        // based on when this override is used
-        isImposter = false;
+        isImposter = imposter;
     }
 
     // override to also set desintation for imposter
-    public PersonData(Emotion em, float x, float y, Destination d) {
+    public PersonData(Emotion em, float x, float y, Destination d, bool imposter = false) {
         emotionState = em;
         posX = x;
         posY = y;
         dest = d;
-        // based on when this override is used
-        isImposter = true;
+        isImposter = imposter;
     }
 }
 

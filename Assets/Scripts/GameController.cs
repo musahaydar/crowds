@@ -14,7 +14,7 @@ public class GameController : MonoBehaviour {
     public Button turnStartButton;
     // public bool readyToMove = false;
     public float readyDelay = 0.5f;
-    public float loadPersonDelay = 0.3f;
+    public float loadPersonDelay = 0.2f;
 
     // UI objects, set in inspector
     public Text turnText, imposterCountText, queuePromptText;
@@ -110,6 +110,7 @@ public class GameController : MonoBehaviour {
         foreach(PersonData personData in people) {
             GameObject personObj = Instantiate(personPrefab);
             personObj.GetComponent<PersonController>().InitPerson(personData);
+            SoundBankController.instance.PlayPieceAppear();
             // add to people queue for gameplay loop
             peopleQueue.Add(personObj.GetComponent<PersonController>());
             // TODO: add sound/visual effect
@@ -121,6 +122,7 @@ public class GameController : MonoBehaviour {
 
         // now waiting for player input button to start the round
         yield return new WaitForSeconds(loadPersonDelay);
+        SoundBankController.instance.beginTurn.Play();
         turnStartButton.interactable = true;
         yield return null;
     }
@@ -198,6 +200,7 @@ public class GameController : MonoBehaviour {
         yield return new WaitForSeconds(0.5f);
         // turn over, enable the start turn button and wait for user input event
         turnStartButton.interactable = true;
+        SoundBankController.instance.beginTurn.Play();
         yield return null;
     }
 
@@ -252,7 +255,7 @@ public class GameController : MonoBehaviour {
 
         // create an imposter gameobject
         imposterInHand = Instantiate(imposterPrefab);
-        imposterInHand.GetComponent<PersonController>().InitPerson(new PersonData(imposterEmotion, -10, -10, imposterDest));
+        imposterInHand.GetComponent<PersonController>().InitPerson(new PersonData(imposterEmotion, -10, -10, imposterDest, true));
         // make the imposter appear transparent
         imposterInHand.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.5f);
         // this is probably inefficient
@@ -317,7 +320,7 @@ public class GameController : MonoBehaviour {
                     if(person.IsImposter()) {
                         turnNum = imposterQueue.IndexOf(person) + 1;
                     } 
-                    else if(!person.IsImposter()) {
+                    else {
                         turnNum = imposterQueue.Count;
                         turnNum += peopleQueue.IndexOf(person) + 1;
                     }
